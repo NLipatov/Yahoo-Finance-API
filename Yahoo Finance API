@@ -1,0 +1,30 @@
+import urllib.request
+import re
+def StockPrice(ticker):
+    url = "https://finance.yahoo.com/quote/%s" % (ticker)
+    html = str(urllib.request.urlopen(url).read())
+    InitialValueString = re.compile("""data-reactid="32"\>\d+\.\d+\<""")
+    rInitialValueString = InitialValueString.findall(html)
+    FinalValueString = re.compile("""\d+\.\d+""")
+    StockPrice = FinalValueString.findall(str(rInitialValueString))
+    intStockPrice = float(StockPrice[0])
+    return intStockPrice
+def PortfolioPositionValue(ticker):
+    Quantity = int(InvestorPortfolio[ticker])
+    StockPrice(ticker)
+    Value = Quantity * StockPrice(ticker)
+    return Value
+def PortfolioValue():
+    ValueList = []
+    for i in InvestorPortfolio:
+        ValueList.append(PortfolioPositionValue(i))
+        print(ValueList)
+        print(sum(ValueList))
+    return sum(ValueList)
+def ConvertToRub(USDValue):
+    USD = StockPrice( 'usdrub=x' )
+    return USDValue * USD
+InvestorPortfolio = {'AMD': 2, 'BSX': 3, 'DHI': 2, 'DB': 4, 'DPW.DE': 1, 'F': 1, 'INTC': 12, 'IBM': 2, 'JNJ': 1, \
+                     'JPM': 5, 'MS': 6, 'PHM': 9, 'SIEGY': 1, 'BK': 4, 'GS': 1}
+
+print(StockPrice('intc'))
