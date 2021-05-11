@@ -1,5 +1,7 @@
 import urllib.request
 import re
+import IBMdb2
+import Time
 def StockPrice(ticker):
     url = "https://finance.yahoo.com/quote/%s" % (ticker)
     html = str(urllib.request.urlopen(url).read())
@@ -18,13 +20,29 @@ def PortfolioValue():
     ValueList = []
     for i in InvestorPortfolio:
         ValueList.append(PortfolioPositionValue(i))
-        print(ValueList)
-        print(sum(ValueList))
-    return sum(ValueList)
-def ConvertToRub(USDValue):
+    return round(sum(ValueList), 2)
+def USDToRUB(USDValue):
     USD = StockPrice( 'usdrub=x' )
     return USDValue * USD
-InvestorPortfolio = {'AMD': 2, 'BSX': 3, 'DHI': 2, 'DB': 4, 'DPW.DE': 1, 'F': 1, 'INTC': 12, 'IBM': 2, 'JNJ': 1, \
+def RUBtoUSD(RUBValue):
+    RUB = StockPrice( 'rubusd=x' )
+    return RUBValue * RUB
+InvestorPortfolio = {'AMD': 2, 'BSX': 3, 'DHI': 2, 'DB': 4, 'DPW.DE': 7, 'F': 7, 'INTC': 12, 'IBM': 2, 'JNJ': 1, \
                      'JPM': 5, 'MS': 6, 'PHM': 9, 'SIEGY': 1, 'BK': 4, 'GS': 1}
 
-print(StockPrice('intc'))
+# print(PortfolioPositionValue('IBM'))
+
+def SendPortfolioToCloud():
+    a = """insert into IP
+    (RECORDID, USD_VALUE, RUB_VALUE, DATE_AND_TIME)
+    Values
+    (V1, V2, V3, V4)"""
+    V1 = (int(IBMdb2.LastRowInIP()) + 1)
+    V2 = PortfolioValue()
+    V3 = USDToRUB(PortfolioValue())
+    V4 = Time.Epoch
+    IBMdb2.command(a.replace('V1', '%s' % (V1)).replace('V2', '%s' % (V2))\
+                   .replace('V3', '%s' % (V3)).replace('V4', '%s' % (V4)))
+
+
+
